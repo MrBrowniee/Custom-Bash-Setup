@@ -1,0 +1,25 @@
+#Add these to the end of .bashrc
+
+#Source bash config from custom config dir
+bash_config_dir="$HOME/.config/bash"
+
+#Ensure globs that don't match expand to nothing (not literal pattern)
+shopt -s nullglob
+
+#Sourc the files
+for file in "$bash_config_dir"/*.sh; do
+	#Prevent history file from messing with bash
+	case "$file" in
+		*history) continue ;;
+	esac
+    	[ -f "$file" ] && . "$file"
+done
+
+#Print current date when opening terminal using a function if it exists in config directory
+if declare -f print_date > /dev/null; then
+    #Date function from functions config file
+    print_date
+fi
+
+#Set either normal or git prompt
+PROMPT_COMMAND=set_prompt
