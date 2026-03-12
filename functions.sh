@@ -4,26 +4,6 @@ case $- in
       *) return;;
 esac
 
-#Create scripts for Github repo (backup)
-#mkscript() {
-    #dir=$1
-    #mkdir -p "$dir" &&
-    #: > "$dir/$dir.sh" &&
-    #: > "$dir/readme.md"
-#}
-
-#mkscript2() {
-    #dir=$1
-    #mkdir -p $dir 
-    #{
-        #printf "#!/usr/bin/env bash \n"
-        #printf "set -euo pipefail \n"
-    #} > $dir/$dir
-
-    #if [[ ! -e "$readme_file" ]];then
-        #cat > "$readme_file" << 
-#}
-
 #Aliasing brave launch from command line for multiple profiles
 unalias brave 2>/dev/null
 
@@ -47,8 +27,22 @@ brave() {
 
 #Recursively change file permissions inside current directory
 fileperm() {
+    local exec_flag=()
+    case "$1" in
     #Remove execution bit from everyone
-    find . -type f -exec chmod a-x -- {} +
+    all-x)
+        exec_flag=(-exec chmod a-x)
+        shift
+        ;;
+    #Only owner can read and write files
+    user_rw)
+        exec_flag=(-exec chmod 600)
+        shift
+        ;;
+    esac
+    command find . -type f "${exec_flag[@]}" -- {} +
+    #Original
+    #find . -type f -exec chmod a-x -- {} +
 }
 
 #Print current date when opening terminal
