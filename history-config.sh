@@ -1,6 +1,15 @@
+# If not running interactively, don't do anything
+case $- in
+    *i*) ;;
+      *) return;;
+esac
+
+#Your history file
 export HISTFILE="$HOME/.config/bash/history"
 shopt -s histappend
-export HISTSIZE=50000
+#Amount of history lines allowed in memory
+export HISTSIZE=5000
+#Amount of history lines allowed in history file
 export HISTFILESIZE=50000
 
 #Avoid duplicate entries and leading spaces

@@ -1,3 +1,9 @@
+# If not running interactively, don't do anything
+case $- in
+    *i*) ;;
+      *) return;;
+esac
+
 #Unset Linux mint default prompt behavior
 unset color_prompt
 unset force_color_prompt

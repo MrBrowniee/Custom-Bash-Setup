@@ -1,5 +1,12 @@
 #Add these to the end of .bashrc
 
+#If distro does not include this in .bashrc by default, add:
+# If not running interactively, don't do anything
+case $- in
+    *i*) ;;
+      *) return;;
+esac
+
 #Source bash config from custom config dir
 bash_config_dir="$HOME/.config/bash"
 

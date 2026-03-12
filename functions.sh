@@ -1,3 +1,9 @@
+# If not running interactively, don't do anything
+case $- in
+    *i*) ;;
+      *) return;;
+esac
+
 #Create scripts for Github repo (backup)
 #mkscript() {
     #dir=$1
@@ -35,7 +41,7 @@ brave() {
             ;;
     esac
 
-    command nohup brave-browser "${profile_flag[@]}" "$@" >/dev/null 2>&1 & disown
+    command nohup brave-browser "${profile_flag[@]}" "$@" >/dev/null 2>&1 &
     #printf "Opening Brave with $profile_flag"
 }
 
