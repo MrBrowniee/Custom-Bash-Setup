@@ -8,41 +8,69 @@ esac
 unalias brave 2>/dev/null
 
 brave() {
+    #Help flag for for checking the options
+    if [[ "$1" == "--help" || "$1" == "-h" ]]; then
+        cat <<EOF
+Improved command to launch brave browser with desired profile.
+Usage: brave [options]
+
+Options:
+    -m, --main  Open main profile
+    -w, --work  Open work profile
+EOF
+        return
+    fi
+
+
+    #Function logic section
+
     #Initialize profile flags
     local profile_flag=()
     case "$1" in 
-        main)
+        --main | -m)
             profile_flag=(--profile-directory="Profile 3")
             shift
             ;;
-        work)
+        --work | -w)
             profile_flag=(--profile-directory="Profile 4")
             shift
             ;;
     esac
 
-    command nohup brave-browser "${profile_flag[@]}" "$@" >/dev/null 2>&1 &
+    command nohup brave-browser "${profile_flag[@]}" "$@" >/dev/null 2>&1 & disown
     #printf "Opening Brave with $profile_flag"
 }
 
 #Recursively change file permissions inside current directory
 fileperm() {
+    #Help flag for for checking the options
+    if [[ "$1" == "--help" || "$1" == "-h" ]]; then
+        cat <<EOF
+Recursively change permissions for only files inside target directory and its subdirectories. 
+Usage: fileperm [options]
+
+Options:
+    -a-x, --all-x   Remove execution bit from everyone
+    -u_rw, user_rw  Only owner can read and write files
+EOF
+        return
+    fi
+
+    #Function logic section
     local exec_flag=()
     case "$1" in
     #Remove execution bit from everyone
-    all-x)
+    --all-x | -a-x)
         exec_flag=(-exec chmod a-x)
         shift
         ;;
     #Only owner can read and write files
-    user_rw)
+    --user_rw | -u_rw)
         exec_flag=(-exec chmod 600)
         shift
         ;;
     esac
     command find . -type f "${exec_flag[@]}" -- {} +
-    #Original
-    #find . -type f -exec chmod a-x -- {} +
 }
 
 #Print current date when opening terminal
