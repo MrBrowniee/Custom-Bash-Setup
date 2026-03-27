@@ -12,7 +12,7 @@ brave() {
     local profile_flag=()
     case "$1" in 
     --help | -h)
-        cat ../Help/brave_help.txt
+        cat ../Help/brave_help
         return
         ;;
     --main | -m)
@@ -35,7 +35,7 @@ fileperm() {
     local exec_flag=()
     case "$1" in
     --help | -h)
-        cat ../Help/fileperm_help.txt
+        cat ../Help/fileperm_help
         return
         ;;
     #Remove execution bit from everyone
