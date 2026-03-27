@@ -1,0 +1,6 @@
+Recursively target files inside target directory and change permission. 
+Usage: fileperm [options]
+
+Options:
+    -a-x, --all-x   Remove execution bit from everyone
+    -u_rw, user_rw  Only owner can read and write files

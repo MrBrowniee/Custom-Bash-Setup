@@ -1,0 +1,86 @@
+#!/usr/bin/env bash
+
+#Get music directory defined in the bash variables
+source ~/.bash/Config/variables
+IFS=$'\n\t'
+
+dir=$1
+
+
+path="$music_dir"
+
+shopt -s nullglob
+#Clean directory path from artist list
+artists=( "$path"/*/ )
+for artist in "${!artists[@]}"; do
+	artists[$artist]=$(basename "${artists[$artist]%/}")
+done
+shopt -u nullglob
+
+PS3="Artist: #> "
+select artistChoice in "${artists[@]}" "Quit"; do
+	case $REPLY in 
+		'' | *![0-9]* ) printf "Not a number"; 
+		continue
+		;;
+	esac
+
+	#Keep track of the chosen artist
+	if [[ -n "${artistChoice:-}" ]]; then 
+		artistDir="$path/$artistChoice"
+
+		#Move forward if chosen dir exists
+		if [[ -d "$artistDir" ]]; then
+			break
+
+		else
+			printf "Directory does not exist \n"
+		fi
+	else 
+		printf "Invalid choice \n"
+	fi	
+done
+
+clear
+printf "Current artist: $(basename "$artistChoice") \n"
+
+shopt -s nullglob
+#Build clean album list according to the artist selection
+albums=( "$artistDir"/*/ )
+for album in "${!albums[@]}"; do
+	albums[$album]=$(basename "${albums[$album]%/}")
+done
+shopt -u nullglob
+
+PS3="Album: #> "
+select albumChoice in "${albums[@]}" "Quit" "Return"; do
+	case $REPLY in 
+		'' | *![0-9]* ) echo "Not a number"; 
+		continue
+		;;
+	esac
+
+	#Keep track of the chosen album
+	if [[ -n "${albumChoice:-}" ]]; then
+		albumDir="$artistDir/$albumChoice"
+
+		#Move forward if chosen dir exists
+		if [[ -d "$albumDir" ]]; then 
+			break
+
+		else
+			printf "Directory does not exist \n"
+		fi
+	else 
+		printf "Invalid choice \n"
+	fi	
+done
+
+clear
+printf "Playing \e[1;4;31m$(basename "$artistChoice")\e[0m - \e[1;4;31m$(basename "$albumChoice")\e[0;37m \n" 
+
+#Start vlc without interface
+command nohup cvlc "$albumDir" >/dev/null 2>&1 &
+
+#clear && 
+exit 0
