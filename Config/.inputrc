@@ -1,17 +1,42 @@
-# If not running interactively, don't do anything
-#case $- in
-    #*i*) ;;
-      #*) return;;
-#esac\
+################################################################################
+## ~/.inputrc
+##
+## Control the behaviour of the readline library used e.g.
+## by the bash in the interactive mode for line editing.
+##
+################################################################################
+#
+# The bell style used e.g. on error or tab completion, possible values
+# are `none', `visible', and `audible' the ringing the bell.
+#
+set bell-style none
 
-#Match pairing
+#
+# If set to on, words which have more than one possible completion without
+# any possible partial completion cause the matches to be listed immediately
+# instead of ringing the bell.
+#
+set show-all-if-unmodified on
 
-#set enable-bracketed-paste on
-#Only available in never readline versions, disable if using older version
-#set match-pairs "':()[]()"
-
-#Enable tab completion on the first key press
+#
+# If set to on, words which have more than one possible completion cause the
+# matches to be listed immediately instead of ringing the bell.
+#
 set show-all-if-ambiguous on
 
-#Case insensitive tab autocomplete
+#
+# #Case insensitive tab autocomplete
+#
 set completion-ignore-case on
+
+
+#
+# Match pairing
+# Does not seem to work at the moment
+#
+#set enable-bracketed-paste on
+#set match-pairs "':()[]()"
+
+#
+# end
+#
