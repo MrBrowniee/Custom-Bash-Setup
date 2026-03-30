@@ -1,0 +1,17 @@
+# If not running interactively, don't do anything
+#case $- in
+    #*i*) ;;
+      #*) return;;
+#esac\
+
+#Match pairing
+
+#set enable-bracketed-paste on
+#Only available in never readline versions, disable if using older version
+#set match-pairs "':()[]()"
+
+#Enable tab completion on the first key press
+set show-all-if-ambiguous on
+
+#Case insensitive tab autocomplete
+set completion-ignore-case on
