@@ -5,12 +5,15 @@ case $- in
 esac
 
 #Your history file
-export HISTFILE="$HOME/.config/bash/history"
+export HISTFILE="$HOME/.bash/history"
+#export HISTFILE="$history_file"
 shopt -s histappend
 #Amount of history lines allowed in memory
-export HISTSIZE=5000
+export HISTSIZE=50000
 #Amount of history lines allowed in history file
-export HISTFILESIZE=50000
+export HISTFILESIZE=100000
+#Adding timestamps to history
+#export HISTTIMEFORMAT="%d/%m/%Y %T "
 
 #Avoid duplicate entries and leading spaces
 export HISTCONTROL=ignoredups:ignorespace
