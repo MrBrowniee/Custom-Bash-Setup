@@ -1,3 +1,6 @@
+#This file is used for binding custom bash functions to keybinds
+#Change other readline behavior in ~/.bash/Config/.inputrc instead
+
 # If not running interactively, don't do anything
 case $- in
     *i*) ;;
