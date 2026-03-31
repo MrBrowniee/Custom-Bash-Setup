@@ -12,7 +12,7 @@ brave() {
     local profile_flag=()
     case "$1" in 
     --help | -h)
-        cat ../Help/brave_help
+        cat $HOME/.bash/Help/brave_help.txt
         return
         ;;
     --main | -m)
@@ -35,7 +35,7 @@ fileperm() {
     local exec_flag=()
     case "$1" in
     --help | -h)
-        cat ../Help/fileperm_help
+        cat $HOME/.bash/Help/fileperm_help.txt
         return
         ;;
     #Remove execution bit from everyone
@@ -92,4 +92,10 @@ mkcd() {
     #done
 #}
 
+#endregion
+
+#region Set gnome terminal title
+set_title() {
+    echo -ne "\033]0;$1 - $PWD\007"
+}
 #endregion
