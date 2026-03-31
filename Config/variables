@@ -1,1 +1,2 @@
 music_dir="/media/storage/Music/Metal"
+#pwd_title='echo -ne "\033]0;$PWD\007"'
