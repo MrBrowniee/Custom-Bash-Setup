@@ -29,6 +29,20 @@ set show-all-if-ambiguous on
 #
 set completion-ignore-case on
 
+#
+# Autocomplete symbols like - to _
+#
+set completion-map-case on
+
+#
+# Colored completions 
+#
+set colored-stats on
+
+#
+# Colored completion prefix
+#
+set colored-completion-prefix on
 
 #
 # Match pairing
@@ -36,6 +50,13 @@ set completion-ignore-case on
 #
 #set enable-bracketed-paste on
 #set match-pairs "':()[]()"
+
+#
+# Cycle completion menu with tab
+#
+$if Bash
+    Tab: menu-complete
+$endif
 
 #
 # end

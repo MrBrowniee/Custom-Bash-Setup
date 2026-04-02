@@ -6,7 +6,6 @@ IFS=$'\n\t'
 
 dir=$1
 
-
 path="$music_dir"
 
 shopt -s nullglob

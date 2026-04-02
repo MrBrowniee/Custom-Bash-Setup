@@ -14,7 +14,7 @@ bash_config_dir="$HOME/.config/bash"
 shopt -s nullglob
 
 #Sourc the files
-for file in "$bash_config_dir"/*.sh; do
+for file in "$bash_config_dir"/*; do
 	#Prevent history file from messing with bash
 	case "$file" in
 		*history) continue ;;
