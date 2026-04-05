@@ -66,6 +66,12 @@ __custom_clear() {
 }
 #endregion
 
+#region Set gnome terminal title
+set_title() {
+    echo -ne "\033]0;$1 - $PWD\007"
+}
+#endregion
+
 #region Switch to git prompt automatically
 set_prompt() {
     if git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
@@ -83,6 +89,12 @@ mkcd() {
 }
 #endregion
 
+#region Function to make frequent drive mounting more convenient
+#mnt() {
+    
+#}
+#endregion
+
 #region Helper function for defining a range of indexes of an array through arguments (Still figuring out the solution)
 #index_range() {
     #local start=$2
@@ -94,8 +106,3 @@ mkcd() {
 
 #endregion
 
-#region Set gnome terminal title
-set_title() {
-    echo -ne "\033]0;$1 - $PWD\007"
-}
-#endregion
