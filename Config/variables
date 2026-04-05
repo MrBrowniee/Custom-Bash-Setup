@@ -1,2 +1,10 @@
-music_dir="/media/storage/Music/Metal"
+#Config file names for .bashrc
+config_files=(
+    aliases 
+    prompt 
+    binds 
+    functions 
+    history-config
+    )
 #pwd_title='echo -ne "\033]0;$PWD\007"'
+music_dir="/media/storage/Music/Metal"
