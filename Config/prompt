@@ -17,7 +17,7 @@ if [ -f /usr/share/git/git-prompt.sh ]; then
 fi
 
 #Normal prompt
-normal_prompt="\[\e[1;35m\][\t] \[\e[1;4;32m\]${USER^}\[\e[0;35m\] @ \[\e[1;36m\]\w \[\e[1;31m\]\$ \[\e[0;37m\]"
+normal_prompt="\[\e[1;35m\][\t] \[\e[1;4;32m\]${USER^}\[\e[0;35m\] @ \[\e[1;36m\]\w \[\e[0;36m\](#\!) \[\e[1;31m\]\$ \[\e[0;37m\]"
 
 #Git prompt
 git_prompt="\[\e[1;35m\][\t] \[\e[1;4;32m\]${USER^}\[\e[0;35m\] @ \[\e[1;36m\]\w$(__git_ps1 " (%s)") \[\e[1;31m\]\$ \[\e[0;37m\]"
