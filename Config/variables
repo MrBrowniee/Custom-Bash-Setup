@@ -1,5 +1,6 @@
+
 #Config file names for .bashrc
-config_files=(
+declare -r config_files=(
     aliases 
     prompt 
     binds 
@@ -7,4 +8,22 @@ config_files=(
     history-config
     )
 #pwd_title='echo -ne "\033]0;$PWD\007"'
-music_dir="/media/storage/Music/Metal"
+declare -r music_dir="/media/storage/Music"
+
+declare -r HISTIGNORE_CMDS=(
+    "ls*"
+    ll
+    __custom_clear
+    pwd
+    history
+    bg
+    fg
+    exit
+    clear
+    reset
+    "term-title*"
+    "fileperm*"
+    "git commit -*"
+    "git add *"
+    "git clone *"
+)
