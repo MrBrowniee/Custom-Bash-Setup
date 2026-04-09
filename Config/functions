@@ -54,7 +54,7 @@ fileperm() {
 #endregion
 
 #region Print current date when opening terminal
-print_date() {
+__print_date() {
     printf "$(date '+\e[1;31m%A \e[1;36m%-d.%-m.\e[0;36m%Y') \n\e[0m"
 }
 #endregion
@@ -62,18 +62,18 @@ print_date() {
 #region Reprint the date on top of terminal when clearing terminal with hotkey
 __custom_clear() {
     command clear
-    print_date
+    __print_date
 }
 #endregion
 
 #region Set gnome terminal title
-set_title() {
+term-title() {
     echo -ne "\033]0;$1 - $PWD\007"
 }
 #endregion
 
 #region Switch to git prompt automatically
-set_prompt() {
+__set_prompt() {
     if git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
         #Set git prompt inside git directories
         PS1="$git_prompt"
