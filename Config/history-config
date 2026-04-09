@@ -4,16 +4,22 @@ case $- in
       *) return;;
 esac
 
-#Your history file
+# Your history file
 export HISTFILE="$HOME/.bash/history"
 #export HISTFILE="$history_file"
 shopt -s histappend
-#Amount of history lines allowed in memory
+# Amount of history lines allowed in memory
 export HISTSIZE=50000
-#Amount of history lines allowed in history file
-export HISTFILESIZE=100000
-#Adding timestamps to history
-#export HISTTIMEFORMAT="%d/%m/%Y %T "
+# Amount of history lines allowed in history file
+export HISTFILESIZE=150000
+# Adding timestamps to history
+export HISTTIMEFORMAT="%d.%m.%Y %T "
 
-#Avoid duplicate entries and leading spaces
-export HISTCONTROL=ignoredups:ignorespace
+# Avoid duplicate entries and leading spaces
+export HISTCONTROL=ignoreboth:erasedups
+
+# Source ignored commands from variables file
+HISTIGNORE=$(
+    IFS=:
+    printf '%s' "${HISTIGNORE_CMDS[*]}"
+)
