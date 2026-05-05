@@ -8,4 +8,4 @@ case $- in
 esac
 
 #Custom clear command bound to CTRL + L
-bind -x '"\C-l":__custom_clear'
+bind '"\C-l\C-l":"__custom_clear\n"'

@@ -6,8 +6,7 @@ IFS=$'\n\t'
 
 dir=$1
 
-
-path="$music_dir"
+path="$music_dir/Metal"
 
 shopt -s nullglob
 #Clean directory path from artist list
@@ -17,8 +16,14 @@ for artist in "${!artists[@]}"; do
 done
 shopt -u nullglob
 
-PS3="Artist: #> "
+#region Artist select
+PS3="Artist name or number: #> "
+
+# Case insensitive matching
+shopt -u nocasematch
+
 select artistChoice in "${artists[@]}" "Quit"; do
+    # Only accept numbers
 	case $REPLY in 
 		'' | *![0-9]* ) printf "Not a number"; 
 		continue
@@ -26,23 +31,35 @@ select artistChoice in "${artists[@]}" "Quit"; do
 	esac
 
 	#Keep track of the chosen artist
-	if [[ -n "${artistChoice:-}" ]]; then 
-		artistDir="$path/$artistChoice"
 
+    # Numeric selection
+	if [[ -n $artistChoice ]]; then
+        artistDir="$path/$artistChoice" 
+		break
+    fi
+
+    # Name-based Selection
+    for dir in "${artists[@]}"; do
+        if [[ $REPLY == "$dir" ]]; then
+            artistChoice=$dir
+            artistDir=$path/$artistChoice
+            break 2 
+        fi
+    done
 		#Move forward if chosen dir exists
-		if [[ -d "$artistDir" ]]; then
+		if [[ -d $artistDir ]]; then
 			break
-
 		else
 			printf "Directory does not exist \n"
 		fi
-	else 
-		printf "Invalid choice \n"
-	fi	
+	#else 
+		#printf "Invalid choice \n"
+	#fi
 done
+shopt -u nocasematch
 
-clear
-printf "Current artist: $(basename "$artistChoice") \n"
+clear && printf "Current artist: %s \n" "$(basename "$artistDir")"
+#endregion
 
 shopt -s nullglob
 #Build clean album list according to the artist selection
@@ -52,35 +69,82 @@ for album in "${!albums[@]}"; do
 done
 shopt -u nullglob
 
-PS3="Album: #> "
+#region Album select
+PS3="Album name or number: #> "
+shopt -u nocasematch
 select albumChoice in "${albums[@]}" "Quit" "Return"; do
+    #Only accept numbers
 	case $REPLY in 
 		'' | *![0-9]* ) echo "Not a number"; 
 		continue
 		;;
 	esac
 
-	#Keep track of the chosen album
-	if [[ -n "${albumChoice:-}" ]]; then
-		albumDir="$artistDir/$albumChoice"
+	# Keep track of the chosen album
 
+    # Choose by number
+	if [[ -n $albumChoice ]]; then
+		albumDir="$artistDir/$albumChoice"
+    
+    # Name-based Selection
+    for dir2 in "${albums[@]}"; do
+        if [[ $REPLY == "$dir2" ]]; then
+            albumChoice=$dir2
+            albumDir=$artistDir/$albumChoice
+            break 2 
+        fi
+    done
 		#Move forward if chosen dir exists
 		if [[ -d "$albumDir" ]]; then 
 			break
-
 		else
 			printf "Directory does not exist \n"
 		fi
-	else 
-		printf "Invalid choice \n"
-	fi	
+	#else 
+		#printf "Invalid choice \n"
+	fi
 done
+shopt -u nocasematch
+#endregion
 
-clear
-printf "Playing \e[1;4;31m$(basename "$artistChoice")\e[0m - \e[1;4;31m$(basename "$albumChoice")\e[0;37m \n" 
+#region Track count
 
-#Start vlc without interface
-command nohup cvlc "$albumDir" >/dev/null 2>&1 &
+# Map tracks into an array
+mapfile -t tracks < <(find "$albumDir" -maxdepth 1 -type f \
+    \( -iname '*.mp3' -o -iname '*.flac' -o -iname '*.ogg' -o -iname '*.wav' \) | sort)
 
-#clear && 
-exit 0
+# Counting tracks from array
+track_count=${#tracks[@]}
+
+# Start vlc without interface
+nohup cvlc --play-and-exit "$albumDir" >/dev/null 2>&1 &
+VLC_PID=$!
+
+clear && printf "Playing \e[1;4;31m%s\e[0m - \e[1;4;31m%s\e[0;37m (PID=%s)
+Track Count: %s \n" \
+    "$(basename "$artistChoice")" "$(basename "$albumChoice")" "$VLC_PID" "$track_count"
+
+# Run read in the background
+read -r < /dev/tty &
+READ_PID=$!
+
+# Wait for either VLC exit or enter input
+wait -n "$VLC_PID" "$READ_PID"
+
+# Check which one finished
+if kill -0 "$VLC_PID" 2>/dev/null; then
+    # User pressed enter first - VLC still running
+    printf "Stopping playback... \n"
+    kill "$VLC_PID"
+    wait "$VLC_PID" 2>/dev/null
+else
+    # VLC finished playback normally
+    printf "Album finished \n"
+fi
+
+# Cleanup
+kill "$READ_PID" 2>/dev/null
+wait "$READ_PID" 2>/dev/null
+
+#command clear && printf "%b\n" \
+    #"$(date '+\e[1;31m%A \e[1;36m%-d.%-m.\e[0;36m%Y\e[0m')"

@@ -23,9 +23,9 @@ done
 #endregion
 
 #Print current date when opening terminal using a function if it exists in config directory
-if declare -f print_date > /dev/null; then
+if declare -f __print_date > /dev/null; then
     #Date function from functions config file
-    print_date
+    __print_date
 fi
 
 #Set either normal or git prompt
