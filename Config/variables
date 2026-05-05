@@ -1,5 +1,5 @@
 
-#Config file names for .bashrc
+# Config file names for .bashrc
 declare -r config_files=(
     aliases 
     prompt 
@@ -10,12 +10,17 @@ declare -r config_files=(
 #pwd_title='echo -ne "\033]0;$PWD\007"'
 declare -r music_dir="/media/storage/Music"
 
+declare -r history_file="$HOME/.bash/history"
+
+# Ignored these commands in history
 declare -r HISTIGNORE_CMDS=(
     "ls*"
     ll
+    "cd ~"
+    "sudo*"
     __custom_clear
     pwd
-    history
+    "history*"
     bg
     fg
     exit
