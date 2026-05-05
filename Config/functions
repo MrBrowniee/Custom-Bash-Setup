@@ -12,7 +12,7 @@ brave() {
     local profile_flag=()
     case "$1" in 
     --help | -h)
-        cat $HOME/.bash/Help/brave_help.txt
+        cat "$HOME"/.bash/Help/brave_help.txt
         return
         ;;
     --main | -m)
@@ -35,34 +35,34 @@ fileperm() {
     local exec_flag=()
     case "$1" in
     --help | -h)
-        cat $HOME/.bash/Help/fileperm_help.txt
+        cat "$HOME"/.bash/Help/fileperm_help.txt
         return
         ;;
     #Remove execution bit from everyone
     --all-x | -a-x)
-        exec_flag=(-exec chmod a-x)
+        exec_flag=(a-x)
         shift
         ;;
     #Only owner can read and write files
     --user_rw | -u_rw)
-        exec_flag=(-exec chmod 600)
+        exec_flag=(600)
         shift
         ;;
     esac
-    command find . -type f "${exec_flag[@]}" -- {} +
+    command find . -type f -exec chmod "${exec_flag[@]}" -- {} +
 } 
 #endregion
 
 #region Print current date when opening terminal
 __print_date() {
-    printf "$(date '+\e[1;31m%A \e[1;36m%-d.%-m.\e[0;36m%Y') \n\e[0m"
+    printf "%b\n" \
+        "$(date '+\e[1;31m%A \e[1;36m%-d.%-m.\e[0;36m%Y\e[0m')"
 }
 #endregion
 
 #region Reprint the date on top of terminal when clearing terminal with hotkey
 __custom_clear() {
-    command clear
-    __print_date
+    command clear && __print_date || exit
 }
 #endregion
 
@@ -73,19 +73,20 @@ term-title() {
 #endregion
 
 #region Switch to git prompt automatically
-__set_prompt() {
-    if git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
-        #Set git prompt inside git directories
-        PS1="$git_prompt"
-    else
-        PS1="$normal_prompt"
-    fi
+__git_prompt() {
+    git rev-parse --is-inside-work-tree &>/dev/null || return
+    #Set git prompt inside git directories
+    local branch
+    branch=$(git symbolic-ref --short HEAD 2>/dev/null \
+        || git describe --tags --exact-match 2>/dev/null)
+    
+    echo "[$branch]"
 }
 #endregion
 
 #region Make new dir > cd into new dir
 mkcd() {
-    mkdir "$1" && cd "$1"
+    mkdir "$1" && cd "$1" || exit
 }
 #endregion
 
