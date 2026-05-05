@@ -59,5 +59,12 @@ $if Bash
 $endif
 
 #
+# Keybinds
+#
+
+"\e[H": "cd ~\n"
+"\e[3~^": "__custom_clear"
+
+#
 # end
 #
