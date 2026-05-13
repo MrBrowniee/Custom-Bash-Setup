@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-#Get music directory defined in the bash variables
+# Get music directory defined in the bash variables
 source ~/.bash/Config/variables
 IFS=$'\n\t'
 
@@ -116,17 +116,27 @@ mapfile -t tracks < <(find "$albumDir" -maxdepth 1 -type f \
 # Counting tracks from array
 track_count=${#tracks[@]}
 
+#endregion
+
+#region Start vlc and read for keyboard interruption
+
 # Start vlc without interface
-nohup cvlc --play-and-exit "$albumDir" >/dev/null 2>&1 &
+nohup cvlc --play-and-exit "${tracks[@]}" >/dev/null 2>&1 &
+#vlc --play-and-exit "${tracks[@]}"
 VLC_PID=$!
 
-clear && printf "Playing \e[1;4;31m%s\e[0m - \e[1;4;31m%s\e[0;37m (PID=%s)
-Track Count: %s \n" \
-    "$(basename "$artistChoice")" "$(basename "$albumChoice")" "$VLC_PID" "$track_count"
+clear && printf "Playing \e[1;4;31m%s\e[0m - \e[1;4;31m%s\e[0;37m
+Track Count: %d 
+VLC PID=%d\n
+Press enter to interrupt playback\n" \
+    "$(basename "$artistChoice")" "$(basename "$albumChoice")" "$track_count" "$VLC_PID"
 
 # Run read in the background
 read -r < /dev/tty &
 READ_PID=$!
+#endregion
+
+#region Exit either normally or by interrupting
 
 # Wait for either VLC exit or enter input
 wait -n "$VLC_PID" "$READ_PID"
@@ -145,6 +155,8 @@ fi
 # Cleanup
 kill "$READ_PID" 2>/dev/null
 wait "$READ_PID" 2>/dev/null
+#endregion
+
 
 #command clear && printf "%b\n" \
     #"$(date '+\e[1;31m%A \e[1;36m%-d.%-m.\e[0;36m%Y\e[0m')"
