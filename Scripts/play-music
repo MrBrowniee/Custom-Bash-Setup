@@ -1,162 +1,123 @@
 #!/usr/bin/env bash
+#region Get music directory defined in the bash variables
+  . ~/.bash/Config/variables 
+  IFS=$'\n\t'
 
-# Get music directory defined in the bash variables
-source ~/.bash/Config/variables
-IFS=$'\n\t'
-
-dir=$1
-
-path="$music_dir/Metal"
-
-shopt -s nullglob
-#Clean directory path from artist list
-artists=( "$path"/*/ )
-for artist in "${!artists[@]}"; do
-	artists[$artist]=$(basename "${artists[$artist]%/}")
-done
-shopt -u nullglob
-
-#region Artist select
-PS3="Artist name or number: #> "
-
-# Case insensitive matching
-shopt -u nocasematch
-
-select artistChoice in "${artists[@]}" "Quit"; do
-    # Only accept numbers
-	case $REPLY in 
-		'' | *![0-9]* ) printf "Not a number"; 
-		continue
-		;;
-	esac
-
-	#Keep track of the chosen artist
-
-    # Numeric selection
-	if [[ -n $artistChoice ]]; then
-        artistDir="$path/$artistChoice" 
-		break
-    fi
-
-    # Name-based Selection
-    for dir in "${artists[@]}"; do
-        if [[ $REPLY == "$dir" ]]; then
-            artistChoice=$dir
-            artistDir=$path/$artistChoice
-            break 2 
-        fi
-    done
-		#Move forward if chosen dir exists
-		if [[ -d $artistDir ]]; then
-			break
-		else
-			printf "Directory does not exist \n"
-		fi
-	#else 
-		#printf "Invalid choice \n"
-	#fi
-done
-shopt -u nocasematch
-
-clear && printf "Current artist: %s \n" "$(basename "$artistDir")"
+  path="$music_dir/Metal"
 #endregion
 
-shopt -s nullglob
-#Build clean album list according to the artist selection
-albums=( "$artistDir"/*/ )
-for album in "${!albums[@]}"; do
-	albums[$album]=$(basename "${albums[$album]%/}")
-done
-shopt -u nullglob
+#region Building arrays from directories
+dir_arr() {
+  shopt -s nullglob
+  local __resultvar=$1
+  local dirPath=$1
+  local dirs=()
+  # Display names instead of dir paths
+  #for dir in "${!dirs[@]}"; do
+  for dir in "${dirPath[@]}"/*/;do 
+    #dirs[$dir]=$(basename "${dirs[$dir]}")
+    dirs+=( "$(basename "${dir%/}")" )
+  done
+  # Return array of dirs based on given arguments
+  printf -v "$__resultvar" '%s' "${dirs[$dir]}"
+  shopt -u nullglob
+}
+#endregion
 
-#region Album select
-PS3="Album name or number: #> "
-shopt -u nocasematch
-select albumChoice in "${albums[@]}" "Quit" "Return"; do
-    #Only accept numbers
-	case $REPLY in 
-		'' | *![0-9]* ) echo "Not a number"; 
-		continue
-		;;
-	esac
+#region Dynamic Selection 
+select_from_list() {
+  local __resultvar=$1
+  local prompt="$2"
+  shift 2
+  local options=("$@") # Expand received arguments
 
-	# Keep track of the chosen album
+  local old_prompt=$PS3
+  PS3="$prompt "
 
+  select opt in "${options[@]}"; do
     # Choose by number
-	if [[ -n $albumChoice ]]; then
-		albumDir="$artistDir/$albumChoice"
-    
-    # Name-based Selection
-    for dir2 in "${albums[@]}"; do
-        if [[ $REPLY == "$dir2" ]]; then
-            albumChoice=$dir2
-            albumDir=$artistDir/$albumChoice
-            break 2 
-        fi
-    done
-		#Move forward if chosen dir exists
-		if [[ -d "$albumDir" ]]; then 
-			break
-		else
-			printf "Directory does not exist \n"
-		fi
-	#else 
-		#printf "Invalid choice \n"
-	fi
-done
-shopt -u nocasematch
+    if [[ -n $opt ]]; then
+      printf -v "$__resultvar" '%s' "$opt" # Return user choice as a variable
+      PS3=$old_prompt # Reset prompt after choice
+      return 0
+    else 
+      echo "Invalid selection"
+    fi
+  done
+}
 #endregion
 
-#region Track count
+# Start vlc for playback and read for keyboard interrupt
+play_album() {
+  local artist=$1
+  local album=$2
 
-# Map tracks into an array
-mapfile -t tracks < <(find "$albumDir" -maxdepth 1 -type f \
+  # Map tracks into an array
+  mapfile -t tracks < <(find "$album" -maxdepth 1 -type f \
     \( -iname '*.mp3' -o -iname '*.flac' -o -iname '*.ogg' -o -iname '*.wav' \) | sort)
 
-# Counting tracks from array
-track_count=${#tracks[@]}
+    trackCount=${#tracks[@]} # Counting tracks from array
 
+  # Start vlc without interface
+  nohup cvlc --play-and-exit "${tracks[@]}" >/dev/null 2>&1 &
+    VLC_PID=$!
+
+  clear && printf "Playing \e[1;4;31m%s\e[0m - \e[1;4;31m%s\e[0;37m
+    Track Count: %d 
+    VLC PID=%d
+    Press enter to interrupt playback\n" \
+    "$(basename "$artist")" "$(basename "$album")" "$trackCount" "$VLC_PID"
+  #echo "${tracks[@]}"
+  # Run read in the background
+  read -r < /dev/tty &
+  READ_PID=$!
+
+  #region Exit normally or by interrupting
+    # Wait for either VLC exit or enter input
+      wait -n "$VLC_PID" "$READ_PID"
+
+    # Check which one finished
+    if kill -0 "$VLC_PID" 2>/dev/null; then
+      # User pressed enter first - VLC still running
+      printf "Stopping playback... \n"
+      kill "$VLC_PID"
+      wait "$VLC_PID" 2>/dev/null
+    else
+      # VLC finished playback normally
+      printf "Album finished \n"
+    fi
+
+    # Cleanup
+      kill "$READ_PID" 2>/dev/null
+      wait "$READ_PID" 2>/dev/null
+  #endregion
+}
+
+#region Artist selection
+shopt -s nullglob
+artists=()
+  # Display names instead of dir paths
+  #for dir in "${!dirs[@]}"; do
+  for artist in "$path"/*/; do 
+    artists+=( "$(basename "${artist}")" )
+  done
+shopt -u nullglob
+
+select_from_list artistChoice "Artist number or name: >" "${artists[@]}"
 #endregion
 
-#region Start vlc and read for keyboard interruption
+#echo "Selected artist: $artistChoice"
 
-# Start vlc without interface
-nohup cvlc --play-and-exit "${tracks[@]}" >/dev/null 2>&1 &
-#vlc --play-and-exit "${tracks[@]}"
-VLC_PID=$!
+#region Album selection
+shopt -s nullglob
+albums=()
+  # Create an array of names instead of dir paths
+  for album in "$path/$artistChoice"/*/; do 
+    albums+=( "$(basename "${album%/}")" )
+  done
+shopt -u nullglob
 
-clear && printf "Playing \e[1;4;31m%s\e[0m - \e[1;4;31m%s\e[0;37m
-Track Count: %d 
-VLC PID=%d\n
-Press enter to interrupt playback\n" \
-    "$(basename "$artistChoice")" "$(basename "$albumChoice")" "$track_count" "$VLC_PID"
+select_from_list albumChoice "Album number or name: >" "${albums[@]}"
 
-# Run read in the background
-read -r < /dev/tty &
-READ_PID=$!
+play_album "$artistChoice" "$path/$artistChoice/$albumChoice"
 #endregion
-
-#region Exit either normally or by interrupting
-
-# Wait for either VLC exit or enter input
-wait -n "$VLC_PID" "$READ_PID"
-
-# Check which one finished
-if kill -0 "$VLC_PID" 2>/dev/null; then
-    # User pressed enter first - VLC still running
-    printf "Stopping playback... \n"
-    kill "$VLC_PID"
-    wait "$VLC_PID" 2>/dev/null
-else
-    # VLC finished playback normally
-    printf "Album finished \n"
-fi
-
-# Cleanup
-kill "$READ_PID" 2>/dev/null
-wait "$READ_PID" 2>/dev/null
-#endregion
-
-
-#command clear && printf "%b\n" \
-    #"$(date '+\e[1;31m%A \e[1;36m%-d.%-m.\e[0;36m%Y\e[0m')"
