@@ -1,7 +1,7 @@
 # If not running interactively, don't do anything
 case $- in
-    *i*) ;;
-      *) return;;
+  *i*) ;;
+    *) return;;
 esac
 
 # Your history file
@@ -21,6 +21,6 @@ HISTCONTROL=ignoreboth:erasedups
 
 # Source ignored commands from variables file
 HISTIGNORE=$(
-    IFS=:
-    printf '%s' "${HISTIGNORE_CMDS[*]}"
+  IFS=:
+  printf '%s' "${HISTIGNORE_CMDS[*]}"
 )
