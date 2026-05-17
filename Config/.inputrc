@@ -62,8 +62,10 @@ $endif
 # Keybinds
 #
 
+# Home key
 "\e[H": "cd ~\n"
-"\e[3~^": "__custom_clear"
+# Del key
+"\e[3~": "__custom_clear\n"
 
 #
 # end
