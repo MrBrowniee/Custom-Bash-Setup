@@ -8,15 +8,15 @@ case $- in
 esac
 
 #region Source bash config from custom config dir
-bash_config_dir="$HOME/.config/bash"
+bash_config_dir="$HOME/.bash/Config"
 
 
 # Source the config file name array from variables file
 . "$bash_config_dir/variables"
 
 #Source the config files using array
-for f in ${config_files[@]}; do
-    file="$bash_config_dir/$f"
+for f in "${config_files[@]}"; do
+  file="$bash_config_dir/$f"
 	[ -r "$file" ] && . "$file"
 done
 
@@ -24,8 +24,8 @@ done
 
 #Print current date when opening terminal using a function if it exists in config directory
 if declare -f __print_date > /dev/null; then
-    #Date function from functions config file
-    __print_date
+  #Date function from functions config file
+  __print_date
 fi
 
 #Set either normal or git prompt
