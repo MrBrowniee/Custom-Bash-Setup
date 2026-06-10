@@ -1,0 +1,8 @@
+#User defined aliases
+#alias alias_name='command'
+
+#Linux Mint default aliases
+# some more ls aliases
+alias ll='ls -alF'
+alias la='ls -A'
+alias l='ls -CF'

@@ -1,0 +1,26 @@
+# If not running interactively, don't do anything
+case $- in
+  *i*) ;;
+    *) return;;
+esac
+
+# Your history file
+#. "$HOME/.bash/Config/variables"
+HISTFILE="$HOME/.bash/history"
+#HISTFILE="$history_file"
+shopt -s histappend
+# Amount of history lines allowed in memory
+HISTSIZE=70000
+# Amount of history lines allowed in history file
+HISTFILESIZE=150000
+# Adding timestamps to history
+HISTTIMEFORMAT="%d.%m.%Y %T "
+
+# Avoid duplicate entries and leading spaces
+HISTCONTROL=ignoreboth:erasedups
+
+# Source ignored commands from variables file
+HISTIGNORE=$(
+  IFS=:
+  printf '%s' "${HISTIGNORE_CMDS[*]}"
+)

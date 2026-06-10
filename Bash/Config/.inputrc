@@ -64,8 +64,6 @@ $endif
 
 # Home key
 "\e[H": "cd ~\n"
-# Del key
-"\e[3~": "__custom_clear\n"
 
 #
 # end

@@ -1,0 +1,113 @@
+# If not running interactively, don't do anything
+case $- in
+  *i*) ;;
+    *) return;;
+esac
+
+# Aliasing brave launch from command line for multiple profiles
+unalias brave 2>/dev/null
+
+brave() {
+    #Initialize profile flags
+    local profile_flag=()
+    case "$1" in 
+    --help | -h)
+        cat "$HOME"/.bash/Help/brave_help.txt
+        return
+        ;;
+    --main | -m)
+        profile_flag=(--profile-directory="Profile 3")
+        shift
+        ;;
+    --work | -w)
+        profile_flag=(--profile-directory="Profile 4")
+        shift
+        ;;
+    esac
+
+    command nohup brave-browser "${profile_flag[@]}" "$@" >/dev/null 2>&1 &
+    #printf "Opening Brave with $profile_flag"
+}
+
+# Recursively change file permissions inside current directory
+fileperm() {
+    local exec_flag=()
+    case "$1" in
+    --help | -h)
+        cat "$HOME"/.bash/Help/fileperm_help.txt
+        return
+        ;;
+    # Remove execution bit from everyone
+    --all-x | -a-x)
+        exec_flag=(a-x)
+        shift
+        ;;
+    # Only owner can read and write files
+    --user_rw | -u_rw)
+        exec_flag=(600)
+        shift
+        ;;
+    esac
+    command find . -type f -exec chmod "${exec_flag[@]}" -- {} +
+} 
+
+# Print current date when opening terminal
+__print_date() {
+    printf "%b\n" \
+        "$(date '+\e[1;31m%A \e[1;36m%-d.%-m.\e[0;36m%Y\e[0m')"
+}
+
+# Reprint the date on top of terminal when clearing terminal with hotkey
+__custom_clear() {
+    command clear && __print_date || exit
+}
+
+# Set gnome terminal title
+term-title() {
+    echo -ne "\033]0;$1 - $PWD\007"
+}
+
+# Switch to git prompt when git repo exists
+__git_prompt() {
+    git rev-parse --is-inside-work-tree &>/dev/null || return
+    #Set git prompt inside git directories
+    local branch
+    branch=$(git symbolic-ref --short HEAD 2>/dev/null \
+        || git describe --tags --exact-match 2>/dev/null)
+    
+    echo "[$branch]"
+}
+
+# Make new dir > cd into new dir
+mkcd() {
+    mkdir "$1" && cd "$1" || exit
+}
+
+# Temp function to back up cyberpunk saves
+2077_save_backup() {
+  local src_dir="/home/brun/.local/share/Steam/steamapps/compatdata/1091500/pfx/drive_c/users/steamuser/Saved Games/CD Projekt Red" # Saves location in Cyberpunk's steam compatdata
+  
+  local target_dir="/media/storage/Game Stuff/Game Saves/Cyberpunk/Current Run" # Backup dir on storage HDD
+  
+  local manualSave_pattern="ManualSave-[0-9]+" # Regex pattern matching manual saves only
+
+  # Copy only manual saves
+  find "$src_dir" -type d -regextype posix-extended -regex ".*/$manualSave_pattern" -exec cp -r {} "$target_dir" \;
+}
+
+#region Function to make frequent drive mounting more convenient
+#mnt() {
+    
+#}
+#endregion
+
+#region Helper function for defining a range of indexes of an array through arguments (Still figuring out the solution)
+#index_range() {
+    #local start=$2
+    #local end=$3
+    #for (( i=$start ; i<=$end ; i++ )); do
+        #$1 "${months_array[$i]}"
+    #done
+#}
+
+#endregion

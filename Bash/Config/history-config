@@ -6,7 +6,7 @@ esac
 
 # Your history file
 #. "$HOME/.bash/Config/variables"
-HISTFILE="$HOME/.bash/history"
+HISTFILE="$HOME/.shell/history"
 #HISTFILE="$history_file"
 shopt -s histappend
 # Amount of history lines allowed in memory

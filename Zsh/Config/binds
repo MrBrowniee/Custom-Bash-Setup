@@ -1,0 +1,11 @@
+#This file is used for binding custom bash functions to keybinds
+#Change other readline behavior in ~/.bash/Config/.inputrc instead
+
+# If not running interactively, don't do anything
+case $- in
+    *i*) ;;
+      *) return;;
+esac
+
+#Custom clear command bound to CTRL + L
+bind '"\C-l\C-l":"__custom_clear\n"'

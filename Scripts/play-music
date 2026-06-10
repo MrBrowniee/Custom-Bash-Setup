@@ -6,7 +6,7 @@
   path="$music_dir/Metal"
 #endregion
 
-#region Building arrays from directories
+# Building arrays from directories
 dir_arr() {
   shopt -s nullglob
   local __resultvar=$1
@@ -22,17 +22,19 @@ dir_arr() {
   printf -v "$__resultvar" '%s' "${dirs[$dir]}"
   shopt -u nullglob
 }
-#endregion
 
-#region Dynamic Selection 
+# Dynamic Selection 
 select_from_list() {
+  #region Vars
   local __resultvar=$1
   local prompt="$2"
   shift 2
   local options=("$@") # Expand received arguments
-
   local old_prompt=$PS3
-  PS3="$prompt "
+  #endregion
+
+  #region Select
+  PS3="$prompt : #> "
 
   select opt in "${options[@]}"; do
     # Choose by number
@@ -40,12 +42,26 @@ select_from_list() {
       printf -v "$__resultvar" '%s' "$opt" # Return user choice as a variable
       PS3=$old_prompt # Reset prompt after choice
       return 0
-    else 
-      echo "Invalid selection"
     fi
+
+    # Choose by name
+    for opt in "${options[@]}"; do
+      if [[ $REPLY == "$opt" ]]; then
+        printf -v "$__resultvar" '%s' "$opt" # Return user choice as a variable
+        return 2
+      fi
+    done
+
+      # Move forward if directory exists
+      if [[ -d "$opt" ]]; then
+        printf -v "$__resultvar" '%s' "$opt" # Return user choice as a variable
+        break
+      else
+        printf "Selected number is out of range or specified directory does not exist \n"
+      fi
   done
+  #endregion
 }
-#endregion
 
 # Start vlc for playback and read for keyboard interrupt
 play_album() {
@@ -56,21 +72,20 @@ play_album() {
   mapfile -t tracks < <(find "$album" -maxdepth 1 -type f \
     \( -iname '*.mp3' -o -iname '*.flac' -o -iname '*.ogg' -o -iname '*.wav' \) | sort)
 
-    trackCount=${#tracks[@]} # Counting tracks from array
+    trackCount=${#tracks[@]} # Track count from array
 
-  # Start vlc without interface
+  # Play array of tracks in vlc without interface
   nohup cvlc --play-and-exit "${tracks[@]}" >/dev/null 2>&1 &
-    VLC_PID=$!
+    VLC_PID=$! # Track PID For managing cleanup
 
   clear && printf "Playing \e[1;4;31m%s\e[0m - \e[1;4;31m%s\e[0;37m
     Track Count: %d 
     VLC PID=%d
     Press enter to interrupt playback\n" \
     "$(basename "$artist")" "$(basename "$album")" "$trackCount" "$VLC_PID"
-  #echo "${tracks[@]}"
   # Run read in the background
   read -r < /dev/tty &
-  READ_PID=$!
+    READ_PID=$!
 
   #region Exit normally or by interrupting
     # Wait for either VLC exit or enter input
@@ -97,16 +112,15 @@ play_album() {
 shopt -s nullglob
 artists=()
   # Display names instead of dir paths
-  #for dir in "${!dirs[@]}"; do
   for artist in "$path"/*/; do 
     artists+=( "$(basename "${artist}")" )
   done
 shopt -u nullglob
 
-select_from_list artistChoice "Artist number or name: >" "${artists[@]}"
-#endregion
+select_from_list artistChoice "Artist number or name" "${artists[@]}"
 
-#echo "Selected artist: $artistChoice"
+clear && printf "Current artist: %s \n" "$(basename "$artistChoice")"
+#endregion
 
 #region Album selection
 shopt -s nullglob
@@ -117,7 +131,7 @@ albums=()
   done
 shopt -u nullglob
 
-select_from_list albumChoice "Album number or name: >" "${albums[@]}"
+select_from_list albumChoice "Album number or name" "${albums[@]}"
 
 play_album "$artistChoice" "$path/$artistChoice/$albumChoice"
 #endregion

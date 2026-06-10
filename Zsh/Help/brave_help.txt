@@ -1,0 +1,6 @@
+Improved command to launch brave browser with desired profile.
+Usage: brave [options]
+
+Options:
+    -m, --main  Open main profile
+    -w, --work  Open work profile

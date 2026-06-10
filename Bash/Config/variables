@@ -1,0 +1,32 @@
+# Suppress shellcheck error for unused variables
+  # shellcheck disable=SC2034
+
+# Config file names for .bashrc
+declare -ra config_files=(
+  "$HOME/.shell/Bash/Config/aliases" 
+  "$HOME/.shell/Bash/Config/prompt" 
+  "$HOME/.shell/Bash/Config/binds" 
+  "$HOME/.shell/Bash/Config/functions"
+  "$HOME/.shell/Bash/Config/history-config"
+  )
+declare -ra music_dir="/media/storage/Music"
+
+# Ignored these commands in history
+declare -ra HISTIGNORE_CMDS=(
+  "ls*"
+  ll
+  "sudo*"
+  __custom_clear
+  pwd
+  "history*"
+  bg
+  fg
+  exit
+  clear
+  reset
+  "term-title*"
+  "fileperm*"
+  "git commit -*"
+  "git add *"
+  "git clone *"
+)
