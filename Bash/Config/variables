@@ -11,7 +11,7 @@ declare -ra config_files=(
   )
 declare -ra music_dir="/media/storage/Music"
 
-# Ignored these commands in history
+# Ignore these commands in history
 declare -ra HISTIGNORE_CMDS=(
   "ls*"
   ll
