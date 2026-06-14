@@ -5,8 +5,7 @@ case $- in
 esac
 
 # Your history file
-#. "$HOME/.bash/Config/variables"
-HISTFILE="$HOME/.shell/history"
+HISTFILE="$HOME/.shell/History/bash_history"
 #HISTFILE="$history_file"
 shopt -s histappend
 # Amount of history lines allowed in memory
