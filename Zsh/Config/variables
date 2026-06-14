@@ -3,15 +3,12 @@
 
 # Config file names for .bashrc
 declare -ra config_files=(
-  "$HOME/.bash/Config/aliases" 
-  "$HOME/.bash/Config/prompt" 
-  "$HOME/.bash/Config/binds" 
-  "$HOME/.bash/Config/functions"
-  "$HOME/.bash/Config/history-config"
-  )
-declare -ra music_dir="/media/storage/Music"
-
-declare -r history_file="$HOME/.bash/history"
+  "$HOME/.shell/Zsh/Config/aliases" 
+  "$HOME/.shell/Zsh/Config/prompt" 
+  "$HOME/.shell/Zsh/Config/functions"
+  "$HOME/.shell/Zsh/Config/history-config"
+)
+music_dir="/media/storage/Music"
 
 # Ignored these commands in history
 declare -ra HISTIGNORE_CMDS=(
